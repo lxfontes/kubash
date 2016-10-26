@@ -1,0 +1,7 @@
+apiVersion: kubash.com/v1
+kind: RunItem
+metadata:
+  name: something
+script: cdn_setup
+arguments:
+  - images
