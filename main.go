@@ -24,7 +24,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/shopify/kubash/types"
+	"github.com/lxfontes/kubash/types"
 	"k8s.io/client-go/1.5/pkg/api"
 	//"k8s.io/client-go/1.5/pkg/fields"
 	"k8s.io/client-go/1.5/pkg/runtime"

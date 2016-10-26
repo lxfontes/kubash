@@ -25,7 +25,7 @@ func init() {
 		&announced.GroupMetaFactoryArgs{
 			GroupName:              GroupName,
 			VersionPreferenceOrder: []string{GroupVersion.Version},
-			ImportPrefix:           "github.com/shopify/kubash/types",
+			ImportPrefix:           "github.com/lxfontes/kubash/types",
 		},
 		announced.VersionToSchemeFunc{
 			GroupVersion.Version: AddToScheme,

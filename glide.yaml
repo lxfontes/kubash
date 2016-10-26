@@ -1,4 +1,4 @@
-package: github.com/shopify/kubash
+package: github.com/lxfontes/kubash
 import:
 - package: github.com/Sirupsen/logrus
   version: ^0.10.0
