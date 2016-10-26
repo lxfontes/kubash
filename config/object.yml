@@ -5,3 +5,12 @@ metadata:
 script: cdn_setup
 arguments:
   - images
+---
+apiVersion: kubash.com/v1
+kind: RunItem
+metadata:
+  name: something-else
+script: cdn_popupate
+arguments:
+  - images
+  - more_images

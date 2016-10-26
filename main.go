@@ -17,6 +17,7 @@ You may obtain a copy of the License at
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -95,30 +96,31 @@ func main() {
 		panic(err.Error())
 	}
 
-	//	client.Get().Resource("runitems").Do()
-
 	source := &testLW{
 		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
-			log.WithField("stage", "watch").Warn(options)
+			log.WithField("stage", "watch").Warnf("%#v", options)
 			return watch.NewFake(), nil
 		},
 		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
 			log.WithField("stage", "list").Warn(options)
 			l := types.RunItemList{}
-			err := client.Get().Resource("runitems").Do().Into(&l)
-			log.WithField("stage", "afetlist").WithError(err).Warn(l)
+			raw, err := client.Get().Resource("runitems").Do().Raw()
+			if err != nil {
+				return nil, err
+			}
+			err = json.Unmarshal(raw, &l)
 			return &l, err
 		},
 	}
-	//source := cache.NewListWatchFromClient(client, "runitems", api.NamespaceAll, fields.Everything())
 
 	handler := func(obj interface{}) {
-		log.Warn(obj)
+		ev := obj.(*types.RunItem)
+		log.WithField("script", ev.Script).Warnf("%v", ev.Arguments)
 	}
 
 	store, c := cache.NewInformer(
 		source,
-		&types.RunItemList{},
+		&types.RunItem{},
 		30*time.Second,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc:    handler,
