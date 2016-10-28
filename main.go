@@ -17,7 +17,6 @@ You may obtain a copy of the License at
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -26,8 +25,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/lxfontes/kubash/types"
+	_ "github.com/lxfontes/kubash/types/install"
 	"k8s.io/client-go/1.5/pkg/api"
-	//"k8s.io/client-go/1.5/pkg/fields"
+	"k8s.io/client-go/1.5/pkg/fields"
 	"k8s.io/client-go/1.5/pkg/runtime"
 	"k8s.io/client-go/1.5/pkg/runtime/serializer"
 	"k8s.io/client-go/1.5/pkg/watch"
@@ -96,31 +96,16 @@ func main() {
 		panic(err.Error())
 	}
 
-	source := &testLW{
-		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
-			log.WithField("stage", "watch").Warnf("%#v", options)
-			return watch.NewFake(), nil
-		},
-		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
-			log.WithField("stage", "list").Warn(options)
-			l := types.RunItemList{}
-			raw, err := client.Get().Resource("runitems").Do().Raw()
-			if err != nil {
-				return nil, err
-			}
-			err = json.Unmarshal(raw, &l)
-			return &l, err
-		},
-	}
-
+	source := cache.NewListWatchFromClient(client, "runitems", api.NamespaceAll, fields.Everything())
 	handler := func(obj interface{}) {
 		ev := obj.(*types.RunItem)
 		log.WithField("script", ev.Script).Warnf("%v", ev.Arguments)
 	}
 
+	var ri types.RunItem
 	store, c := cache.NewInformer(
 		source,
-		&types.RunItem{},
+		&ri,
 		30*time.Second,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc:    handler,
